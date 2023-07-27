@@ -25,8 +25,8 @@ CMEASURE=-D $(CLOCK)
 ifeq ($(KERNEL), ROCBLAS)
 	LFLAGS=-lrocblas
 	SRC_KERNEL=./src/kernel/kernel_rocblas.cpp
-	SRC_DRIVER=./src/driver.cpp
-	SRC_CHECKER=./src/driver_check.cpp
+	SRC_DRIVER=./src/bench/driver_gpublas.cpp
+	SRC_CHECKER=./src/check/driver_check.cpp
 else ifeq ($(KERNEL), CUBLAS)
 	LFLAGS=-lcublas
 	OPT_FLAGS=-gencode=arch=compute_52,code=sm_52 \
@@ -37,12 +37,12 @@ else ifeq ($(KERNEL), CUBLAS)
 			-gencode=arch=compute_80,code=sm_80 \
 			-gencode=arch=compute_80,code=compute_80
 	SRC_KERNEL=./src/kernel/kernel_cublas.cu
-	SRC_DRIVER=./src/driver.cpp
-	SRC_CHECKER=./src/driver_check.cpp
+	SRC_DRIVER=./src/bench/driver_gpublas.cpp
+	SRC_CHECKER=./src/check/driver_check.cpp
 else ifeq ($(KERNEL), CBLAS)
 	LFLAGS=-lblas
-	SRC_DRIVER=./src/driver.c
-	SRC_CHECKER=./src/driver_check.c
+	SRC_DRIVER=./src/bench/driver_cblas.c
+	SRC_CHECKER=./src/check/driver_check.c
 endif
 
 

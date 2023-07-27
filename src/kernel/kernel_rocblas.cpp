@@ -3,9 +3,7 @@
 #include <rocblas/rocblas.h>
 #include "kernel_rocblas.h"
 
-extern rocblas_handle handle;
-
-void kernel_rocblasDmm (rocblas_handle handle, unsigned int m, unsigned int k, const double* a, const double* b, double* c)
+void kernel_rocblasDgemm (rocblas_handle handle, unsigned int m, unsigned int k, const double* a, const double* b, double* c)
 {
     int size_ab = m * k * sizeof(double);
     int size_c  = m * m * sizeof(double);
@@ -35,7 +33,7 @@ void kernel_rocblasDmm (rocblas_handle handle, unsigned int m, unsigned int k, c
     CHECK(hipFree(d_c));
 }
 
-void kernel_rocblasSmm (rocblas_handle handle, unsigned int m, unsigned int k, const float* a, const float* b, float* c)
+void kernel_rocblasSgemm (rocblas_handle handle, unsigned int m, unsigned int k, const float* a, const float* b, float* c)
 {
     int size_ab = m * k * sizeof(float);
     int size_c  = m * m * sizeof(float);

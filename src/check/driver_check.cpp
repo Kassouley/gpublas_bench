@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <cblas.h>
-#include "driver.h"
+#include "gpublas.h"
+extern "C" {
 #include "tab.h"
+}
 
 #define OUTOUT_FILE "output_check.txt"
 
@@ -30,18 +31,23 @@ int main(int argc, char **argv)
     }
     
     srand(0);
-    
-    int size_ab = m * k * sizeof(PRECISION_T);
-    int size_c  = m * m * sizeof(PRECISION_T);
 
-    PRECISION_T *a = (PRECISION_T*)malloc(size_ab);
-    PRECISION_T *b = (PRECISION_T*)malloc(size_ab);
-    PRECISION_T *c = (PRECISION_T*)malloc(size_c);
+    int size_ab = m * k * sizeof(precision_t);
+    int size_c  = m * m * sizeof(precision_t);
 
-    RANDOM_ARRAY_2D(m, k, a);
-    RANDOM_ARRAY_2D(k, m, b);
+    precision_t *a = (precision_t*)malloc(size_ab);
+    precision_t *b = (precision_t*)malloc(size_ab);
+    precision_t *c = (precision_t*)malloc(size_c);
 
-    KERNEL(m, k, a, b, c);
+    random_Xarray_2D(m, k, a);
+    random_Xarray_2D(k, m, b);
+
+    gpublas_handle_t handle;
+    gpublas_handle_create(handle);
+
+    kernel_gpublasXgemm(handle, m, k, a, b, c);
+
+    gpublas_handle_destroy(handle);
 
     output = fopen(file_name, "w");
     for (int i = 0; i < m; i++)
