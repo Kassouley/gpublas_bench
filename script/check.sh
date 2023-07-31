@@ -9,8 +9,9 @@ usage="
   Usage: $0 {options} <kernel>\n
   options:\n
     \t-h,--help : print help\n
-    \t-a,-all : check all kernel\n
     \t-v,--verbose : print all make output\n
+    \t-S,--SP : run simple precision matrix mul\n
+    \t-D,--DP : run double precision matrix mul\n
     \t-mXXX : the m dimension of the matrix\n
     \t-kXXX : the k dimension of the matrix\n
   m: default value = 100\n
@@ -88,12 +89,13 @@ kernel_list=( rocblas rocblas_wo_dt cublas cublas_wo_dt )
 kernel_to_check=()
 verbose=0
 output="> /dev/null"
+precision="DP"
 all=0
 m=100
 k=100
 
-TEMP=$(getopt -o havm:k: \
-              -l help,all,verbose \
+TEMP=$(getopt -o haSDvm:k: \
+              -l help,all,SP,DP,verbose \
               -n $(basename $0) -- "$@")
 
 if [ $? != 0 ]; then usage ; fi
@@ -106,8 +108,11 @@ while true ; do
         -v|--verbose) verbose=1 ; shift ;;
         -m) m=$2 ; shift 2;;
         -k) k=$2 ; shift 2;;
+        -S|--SP) precision="SP" ; shift ;;
+        -D|--DP) precision="DP" ; shift ;;
         --) shift ; break ;;
-        -h|--help|*) usage ;;
+        -h|--help) usage ;;
+        *) echo "No option $1."; usage ;;
     esac
 done
 

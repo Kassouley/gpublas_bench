@@ -12,7 +12,8 @@ usage()
     \t-p,--plot : create a png plot with the results in a png file \n
     \t-s,--save : save the measure output in an output file\n
     \t-v,--verbose : print all make output\n
-    \t-m,--milliseconds : time is in milliseconds instead of RTDSC-Cycles\n
+    \t-S,--SP : run simple precision matrix mul\n
+    \t-D,--DP : run double precision matrix mul\n
     \t-f,--force : do not ask for starting the measure\n
   problem size :\n\tdefault value = 100\n
   kernels:\n
@@ -88,7 +89,7 @@ force=0
 plot=0
 save=0
 
-TEMP=$(getopt -o hfSPvsp \
+TEMP=$(getopt -o hfSDvsp \
               -l help,force,SP,DP,verbose,save,plot \
               -n $(basename $0) -- "$@")
 
