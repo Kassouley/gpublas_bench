@@ -161,8 +161,8 @@ echo "   m   |   k   |    GFLOPS/S     |   minimum (ms)   |   median (ms)   |   
     done
   done
 
-  plot_file="$WORKDIR/graphs/graph_"$kernel"_$(date +%F-%T).png"
-  save_file="$WORKDIR/output/measure_"$kernel"_$(date +%F-%T).out"
+  plot_file="$WORKDIR/graphs/graph_"$kernel"_"$precision"_$(date +%F-%T).png"
+  save_file="$WORKDIR/output/measure_"$kernel"_"$precision"_$(date +%F-%T).out"
 
   if [ $plot == 1 ]; then
     echo "Graph generation . . ."
