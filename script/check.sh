@@ -43,7 +43,7 @@ check_error()
 build_kernel()
 {
   eval echo "Build $kernel_lowercase kernel . . . " $output
-  eval make check -B  KERNEL=$kernel_uppercase $output
+  eval make check -B  KERNEL=$kernel_uppercase P=$precision $output
   check_error "make failed"
   eval echo "Done" $output
 }
