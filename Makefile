@@ -3,7 +3,7 @@ ifeq ($(P),)
 endif
 
 IS_KERNEL_ROCBLAS := $(filter $(KERNEL), ROCBLAS ROCBLAS_WO_DT)
-IS_KERNEL_CUDA := $(filter $(KERNEL), CUDA CUDA_WO_DT)
+IS_KERNEL_CUDA := $(filter $(KERNEL), CUBLAS CUBLAS_WO_DT)
 
 # -------------------- CC -------------------- #
 CC=none
@@ -13,21 +13,21 @@ ifeq ($(CC),none)
 	else ifneq ($(IS_KERNEL_CUDA),)
 		CC=nvcc
 	else
-		CC=gcc
+		CC=nvc
 	endif
 endif
 
 # --------------- SRC & FLAGS ---------------- #
-CFLAGS=-g -O3 -lm -I./include -D $(P) -D $(KERNEL) -fopenmp -lm
+CFLAGS=-g -O3 -lm -I./include -D $(P) -D $(KERNEL) -lm
 
 IS_KERNEL_IN_CPP := $(filter $(KERNEL), ROCBLAS CUBLAS)
 IS_KERNEL_IN_CPP_WO_DT := $(filter $(KERNEL), ROCBLAS_WO_DT CUBLAS_WO_DT)
 
 ifneq ($(IS_KERNEL_ROCBLAS),)
-	LFLAGS=-lrocblas
+	LFLAGS=-lrocblas -fopenmp
 	SRC_KERNEL=./src/kernel/kernel_rocblas.cpp
 else ifneq ($(IS_KERNEL_CUDA),)
-	LFLAGS=-lcublas
+	LFLAGS=-lcublas -Xcompiler -fopenmp
 	OPT_FLAGS=-gencode=arch=compute_52,code=sm_52 \
 			-gencode=arch=compute_60,code=sm_60 \
 			-gencode=arch=compute_61,code=sm_61 \
@@ -37,7 +37,7 @@ else ifneq ($(IS_KERNEL_CUDA),)
 			-gencode=arch=compute_80,code=compute_80
 	SRC_KERNEL=./src/kernel/kernel_cublas.cu
 else ifeq ($(KERNEL), CBLAS)
-	LFLAGS=-lblas
+	LFLAGS=-lblas -fopenmp
 	SRC_DRIVER=./src/bench/driver_cblas.c
 	SRC_CHECKER=./src/check/driver_check.c
 endif

@@ -5,23 +5,23 @@
 #include "kernel_cublas.h"
 
 #ifdef CUBLAS_WO_DT
-void kernel_rocblasDgemm (cublasHandle_t handle, unsigned int m, unsigned int k, const double* a, const double* b, double* c)
+void kernel_cublasDgemm (cublasHandle_t handle, unsigned int m, unsigned int k, const double* a, const double* b, double* c)
 {
     const double alpha = 1.0f; 
     const double beta = 0.0f;
 
     // C[mxm] = A[mxk] * B[kxm]
-    cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, m, k, &alpha, a, m, b, k, &beta, c, m);
+    cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, m, k, &alpha, b, m, a, k, &beta, c, m);
 
 }
 
-void kernel_rocblasSgemm (cublasHandle_t handle, unsigned int m, unsigned int k, const float* a, const float* b, float* c)
+void kernel_cublasSgemm (cublasHandle_t handle, unsigned int m, unsigned int k, const float* a, const float* b, float* c)
 {
     const float alpha = 1.0f; 
     const float beta = 0.0f;
 
     // C[mxm] = A[mxk] * B[kxm]
-    cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, m, k, &alpha, a, m, b, k, &beta, c, m);
+    cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, m, k, &alpha, b, m, a, k, &beta, c, m);
 
 }
 #endif
@@ -44,7 +44,7 @@ void kernel_cublasDgemm (cublasHandle_t handle, unsigned int m, unsigned int k, 
 
     double alpha = 1.0f;
     double beta = 0.0f;
-    cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, m, k, &alpha, d_a, m, d_b, k, &beta, d_c, m);
+    cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, m, k, &alpha, d_b, m, d_a, k, &beta, d_c, m);
         
 	CHECK(cudaMemcpy(c, d_c, size_c, cudaMemcpyDeviceToHost));
 
@@ -71,7 +71,7 @@ void kernel_cublasSgemm (cublasHandle_t handle, unsigned int m, unsigned int k, 
 
     float alpha = 1.0f;
     float beta = 0.0f;
-    cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, m, k, &alpha, d_a, m, d_b, k, &beta, d_c, m);
+    cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, m, k, &alpha, d_b, m, d_a, k, &beta, d_c, m);
         
 	CHECK(cudaMemcpy(c, d_c, size_c, cudaMemcpyDeviceToHost));
 

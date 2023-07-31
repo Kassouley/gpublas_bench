@@ -14,7 +14,7 @@ void kernel_cublasSgemm (cublasHandle_t handle, unsigned int m, unsigned int k, 
     }
 #endif
 #ifdef DP
-    #define kernel_gpublasXgemm(m, k, a, b, c)\
+    #define kernel_gpublasXgemm(handle, m, k, a, b, c)\
     { \
         kernel_cublasDgemm(handle, m, k, a, b, c); \
     }

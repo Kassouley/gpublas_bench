@@ -22,7 +22,7 @@ void kernel_rocblasSgemm (rocblas_handle handle, unsigned int m, unsigned int k,
 
     // C[mxm] = A[mxk] * B[kxm]
     rocblas_sgemm(handle, rocblas_operation_none, rocblas_operation_none,
-                m, m, k, &alpha, a, k, b, m, &beta, c, m);
+                m, m, k, &alpha, b, m, a, k, &beta, c, m);
 }
 #endif
 #ifdef ROCBLAS
@@ -77,7 +77,7 @@ void kernel_rocblasSgemm (rocblas_handle handle, unsigned int m, unsigned int k,
 
     // C[mxm] = A[mxk] * B[kxm]
     rocblas_sgemm(handle, rocblas_operation_none, rocblas_operation_none,
-                m, m, k, &alpha, d_a, k, d_b, m, &beta, d_c, m);
+                m, m, k, &alpha, d_b, m, d_a, k, &beta, d_c, m);
 
     CHECK(hipMemcpy(c, d_c, size_c, hipMemcpyDeviceToHost));
 
