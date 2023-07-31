@@ -1,8 +1,31 @@
 #include <stdio.h>
 #include <cuda_runtime.h>
 #include <cublas_v2.h>
+#include "gpublas.h"
 #include "kernel_cublas.h"
 
+#ifdef CUBLAS_WO_DT
+void kernel_rocblasDgemm (cublasHandle_t handle, unsigned int m, unsigned int k, const double* a, const double* b, double* c)
+{
+    const double alpha = 1.0f; 
+    const double beta = 0.0f;
+
+    // C[mxm] = A[mxk] * B[kxm]
+    cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, m, k, &alpha, a, m, b, k, &beta, c, m);
+
+}
+
+void kernel_rocblasSgemm (cublasHandle_t handle, unsigned int m, unsigned int k, const float* a, const float* b, float* c)
+{
+    const float alpha = 1.0f; 
+    const float beta = 0.0f;
+
+    // C[mxm] = A[mxk] * B[kxm]
+    cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, m, k, &alpha, a, m, b, k, &beta, c, m);
+
+}
+#endif
+#ifdef CUBLAS
 void kernel_cublasDgemm (cublasHandle_t handle, unsigned int m, unsigned int k, const double* a, const double* b, double* c)
 {
     int size_ab = m * k * sizeof(double);
@@ -56,3 +79,4 @@ void kernel_cublasSgemm (cublasHandle_t handle, unsigned int m, unsigned int k, 
     CHECK(cudaFree(d_b));
     CHECK(cudaFree(d_c));
 }
+#endif

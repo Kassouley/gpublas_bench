@@ -41,37 +41,54 @@ int main(int argc, char **argv)
 
     random_Xarray_2D(m, k, a);
     random_Xarray_2D(k, m, b);
+    
+    precision_t *d_a = NULL;
+    precision_t *d_b = NULL;
+
+    gpublas_malloc(d_a, size_ab);
+    gpublas_malloc(d_b, size_ab);
+    
+    gpublas_memcpy_HtD(d_a, a, size_ab);
+    gpublas_memcpy_HtD(d_b, b, size_ab);
 
     for (unsigned int n = 0; n < NB_META; n++)
     {
         precision_t *c = (precision_t*)malloc(size_c);
+        precision_t *d_c = NULL;
+        gpublas_malloc(d_c, size_c);
         if ( n == 0 )
         {
             for (unsigned int i = 0; i < nwu; i++)
             {
-                kernel_gpublasXgemm(handle, m, k, a, b, c);
+                kernel_gpublasXgemm(handle, m, k, d_a, d_b, d_c);
                 gpublas_deviceSynchronize();
             }
         }
         else
         {
-            kernel_gpublasXgemm(handle, m, k, a, b, c);
+            kernel_gpublasXgemm(handle, m, k, d_a, d_b, d_c);
             gpublas_deviceSynchronize();
         }
 
         const double t1 = omp_get_wtime();
         for (unsigned int i = 0; i < nrep; i++)
         {
-            kernel_gpublasXgemm(handle, m, k, a, b, c);
+            kernel_gpublasXgemm(handle, m, k, d_a, d_b, d_c);
             gpublas_deviceSynchronize();
         }
         const double t2 = omp_get_wtime();
         
         tdiff[n] = t2 - t1;
+
+        gpublas_memcpy_DtH(c, d_c, size_c);
+        gpublas_free(d_c);
         free(c);
     }
     
     gpublas_handle_destroy(handle);
+    
+    gpublas_free(d_a);
+    gpublas_free(d_b);
     free(a);
     free(b);
 

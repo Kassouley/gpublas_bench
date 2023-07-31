@@ -1,5 +1,0 @@
-
-#ifdef CUBLAS
-#endif
-
-#endif

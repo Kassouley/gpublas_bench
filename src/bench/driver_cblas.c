@@ -5,7 +5,6 @@
 #include "kernel_cblas.h"
 #include "tab.h"
 #include "print_measure.h"
-#include "time_measure.h"
 
 #define NB_META 31
 

@@ -4,14 +4,6 @@
 #include <hip/hip_runtime.h>
 #include <rocblas/rocblas.h>
 
-#define CHECK(cmd) \
-{\
-    hipError_t error  = cmd;\
-    if (error != hipSuccess) { \
-        fprintf(stderr, "error: '%s'(%d) at %s:%d\n", hipGetErrorString(error), error,__FILE__, __LINE__); \
-        exit(EXIT_FAILURE);\
-    }\
-}
 
 void kernel_rocblasDgemm (rocblas_handle handle, unsigned int m, unsigned int k, const double* a, const double* b, double* c);
 void kernel_rocblasSgemm (rocblas_handle handle, unsigned int m, unsigned int k, const float* a, const float* b, float* c);

@@ -1,8 +1,31 @@
 #include <stdio.h>
 #include <hip/hip_runtime.h>
 #include <rocblas/rocblas.h>
+#include "gpublas.h"
 #include "kernel_rocblas.h"
 
+#ifdef ROCBLAS_WO_DT
+void kernel_rocblasDgemm (rocblas_handle handle, unsigned int m, unsigned int k, const double* a, const double* b, double* c)
+{
+    const double alpha = 1.0f; 
+    const double beta = 0.0f;
+
+    // C[mxm] = A[mxk] * B[kxm]
+    rocblas_dgemm(handle, rocblas_operation_none, rocblas_operation_none,
+                m, m, k, &alpha, b, m, a, k, &beta, c, m);
+}
+
+void kernel_rocblasSgemm (rocblas_handle handle, unsigned int m, unsigned int k, const float* a, const float* b, float* c)
+{
+    const float alpha = 1.0f; 
+    const float beta = 0.0f;
+
+    // C[mxm] = A[mxk] * B[kxm]
+    rocblas_sgemm(handle, rocblas_operation_none, rocblas_operation_none,
+                m, m, k, &alpha, a, k, b, m, &beta, c, m);
+}
+#endif
+#ifdef ROCBLAS
 void kernel_rocblasDgemm (rocblas_handle handle, unsigned int m, unsigned int k, const double* a, const double* b, double* c)
 {
     int size_ab = m * k * sizeof(double);
@@ -62,3 +85,4 @@ void kernel_rocblasSgemm (rocblas_handle handle, unsigned int m, unsigned int k,
     CHECK(hipFree(d_b));
     CHECK(hipFree(d_c));
 }
+#endif

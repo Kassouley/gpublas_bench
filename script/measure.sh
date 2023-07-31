@@ -9,9 +9,8 @@ usage()
   \nUsage: $0 {options} [problem size] <kernels>\n\n
   options:\n
     \t-h,--help : print help\n
-    \t-a,-all : measure all kernel\n
-    \t-p,--plot={plot_file} : create a png plot with the results in png file in argument (default: ./graphs/graph_DATE.png)\n
-    \t-s,--save={out_file} : save the measure output in file in argument (default: ./output/measure_DATE.out)\n
+    \t-p,--plot : create a png plot with the results in a png file \n
+    \t-s,--save : save the measure output in an output file\n
     \t-v,--verbose : print all make output\n
     \t-m,--milliseconds : time is in milliseconds instead of RTDSC-Cycles\n
     \t-f,--force : do not ask for starting the measure\n
@@ -42,8 +41,8 @@ check_error()
 ############################################################
 measure_kernel()
 {
-  echo -e "Measure kernel $KERNEL (A["$1"x"$2"] * B["$2"x"$1"]) . . ."
-  cmd="$WORKDIR/measure $1 $2 100 500"
+  echo -e "Measure kernel $kernel (A["$1"x"$2"] * B["$2"x"$1"]) . . ."
+  cmd="$WORKDIR/measure $1 $2 10 10"
   eval echo "exec command : $cmd" $output
   eval $cmd
   check_error "run measure failed"
@@ -51,8 +50,8 @@ measure_kernel()
 
 build_kernel()
 {
-  echo -e -n "Build kernel $KERNEL . . . "
-  eval make measure -B KERNEL=$KERNEL CLOCK=$clock P=$precision $output
+  echo -e -n "Build kernel $kernel . . . "
+  eval make measure -B KERNEL=$KERNEL P=$precision $output
   check_error "build failed"
   echo "Done"
 }
@@ -69,11 +68,9 @@ cd $WORKDIR
 ############################################################
 GPU_CHECK=$( lshw -C display 2> /dev/null | grep nvidia )
 GPU=NVIDIA
-KERNEL=CUBLAS
 if [[ -z "$GPU_CHECK" ]]; then
   GPU_CHECK=$( lshw -C display 2> /dev/null | grep amd )
   GPU=AMD
-  KERNEL=ROCBLAS
 fi
 if [[ -z "$GPU_CHECK" ]]; then
   echo "No GPU found."
@@ -88,13 +85,11 @@ precision="DP"
 verbose=0
 output="> /dev/null"
 force=0
-clock="RDTSC"
-clock_label="RDTSC-cycles"
+plot=0
 save=0
-save_file="$WORKDIR/output/measure_$(date +%F-%T).out"
 
-TEMP=$(getopt -o hfSPvms:: \
-              -l help,force,SP,DP,verbose,millisecond,save:: \
+TEMP=$(getopt -o hfSPvsp \
+              -l help,force,SP,DP,verbose,save,plot \
               -n $(basename $0) -- "$@")
 
 eval set -- "$TEMP"
@@ -107,17 +102,8 @@ while true ; do
         -D|--DP) precision="DP" ; shift ;;
         -f|--force) force=1 ; shift ;;
         -v|--verbose) verbose=1 ; shift ;;
-        -m|--millisecond) clock="MS" ; clock_label="Time (ms)"; shift ;;
-        -s|--save) 
-            case "$2" in
-                "") save=1; shift 2 ;;
-                *)  save=1; save_file="$2" ; shift 2 ;;
-            esac ;;
-        -p|--plot) 
-            case "$2" in
-                "") plot=1; shift 2 ;;
-                *)  plot=1; plot_file="$2" ; shift 2 ;;
-            esac ;;
+        -s|--save) save=1; shift ;;
+        -p|--plot) plot=1; shift ;;
         --) shift ; break ;;
         -h|--help) usage ;;
         *) echo "No option $1."; usage ;;
@@ -127,14 +113,17 @@ done
 ############################################################
 # SUMMARY OF THE RUN                                       #
 ############################################################
-echo -n "Summary measure ($clock_label) on a $precision matrix on $GPU GPU"
+echo -n "Summary measure ($precision matrix) on $GPU GPU"
 if [ $verbose == 1 ]; then
   output=""
   echo -n " (with verbose mode)"
 fi 
-echo -e "\nKernel to measure : $KERNEL"
+echo -e "\nKernel to measure : $@"
+if [ $plot == 1 ]; then
+  echo "Plot will be generated in graphs/ dir"
+fi 
 if [ $save == 1 ]; then
-  echo "Measure will be saved in '$save_file'"
+  echo "Measure will be saved in output/ dir"
 fi 
 
 if [ $force == 0 ]; then
@@ -151,34 +140,43 @@ fi
 ############################################################
 # START MEASURE                                            #
 ############################################################
+
+for kernel in $@
+do
+
+KERNEL=`echo "$kernel" | tr '[:lower:]' '[:upper:]'`
+
 if [[ -f $WORKDIR/output/measure_tmp.out ]]; then
   rm $WORKDIR/output/measure_tmp.out
 fi
-echo "   m   |   k   |     minimum     |     median     |   stability" > $WORKDIR/output/measure_tmp.out
+echo "   m   |   k   |    GFLOPS/S     |   minimum (ms)   |   median (ms)   |   stability (%)" > $WORKDIR/output/measure_tmp.out
 
+  build_kernel
+  for k in {1..32}
+  do
+    for m in {500..3000..100}
+    do
+        measure_kernel $m $k
+    done
+  done
 
-build_kernel
-k=1
-for m in {500..3000..100}
-do
-    measure_kernel $m $k
-    k=$(($k+1))
+  plot_file="$WORKDIR/graphs/graph_"$kernel"_$(date +%F-%T).png"
+  save_file="$WORKDIR/output/measure_"$kernel"_$(date +%F-%T).out"
+
+  if [ $plot == 1 ]; then
+    echo "Graph generation . . ."
+    python3 ./python/graph-gen-measure.py $WORKDIR/output/measure_tmp.out $plot_file
+    echo "Graph created in file $plot_file"
+  fi
+
+  echo "---------------------"
+  echo "Result Summary : "
+  cat $WORKDIR/output/measure_tmp.out
+  echo "---------------------"
+
+  if [ $save == 1 ]; then
+    mv $WORKDIR/output/measure_tmp.out $save_file
+  fi
 done
-
 eval make clean $output
-
-if [ $plot == 1 ]; then
-  echo "Graph generation . . ."
-  python3 ./python/graph-gen-measure.py $data_size $WORKDIR/output/measure_tmp.out $plot_file $clock_label
-  echo "Graph created in file $plot_file"
-fi
-
-echo "---------------------"
-echo "Result Summary : "
-cat $WORKDIR/output/measure_tmp.out
-echo "---------------------"
-
-if [ $save == 1 ]; then
-  mv $WORKDIR/output/measure_tmp.out $save_file
-fi
 

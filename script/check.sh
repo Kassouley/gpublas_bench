@@ -84,7 +84,7 @@ fi
 # CHECK OPTIONS                                            #
 ############################################################
 
-kernel_list=( rocblas cublas )
+kernel_list=( rocblas rocblas_wo_dt cublas cublas_wo_dt )
 kernel_to_check=()
 verbose=0
 output="> /dev/null"
