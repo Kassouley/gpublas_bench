@@ -13,7 +13,7 @@ ifeq ($(CC),none)
 	else ifneq ($(IS_KERNEL_CUDA),)
 		CC=nvcc
 	else
-		CC=nvc
+		CC=gcc
 	endif
 endif
 

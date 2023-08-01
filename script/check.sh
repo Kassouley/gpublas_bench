@@ -142,7 +142,7 @@ fi
 ############################################################
 echo "Début des vérifications des sorties"
 eval echo -e "Check base kernel . . ." $output
-eval make check KERNEL=CBLAS -B $output
+eval make check KERNEL=CBLAS P=$precision -B $output
 check_error "make echoué"
 eval ./check $m $k "./output/check_cblas.out"
 check_error "lancement du programme echoué"
