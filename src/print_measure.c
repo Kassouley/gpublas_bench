@@ -40,8 +40,8 @@ void print_measure(unsigned int m, unsigned int k, unsigned int nrep, double tdi
   
     printf("-----------------------------------------------------\n");
 
-    printf("Minimum (time, ms): %13s %10.3f ms\n", "", time_min*1e3);
-    printf("Median (time, ms):  %13s %10.3f ms\n", "", time_med*1e3);
+    printf("Minimum (time, ms): %13s %10.3f ms\n", "", time_min * 1e3);
+    printf("Median (time, ms):  %13s %10.3f ms\n", "", time_med * 1e3);
     
     if (stabilite >= 10)
         printf("Bad Stability: %18s %10.2f %%\n", "", stabilite);

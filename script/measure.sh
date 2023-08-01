@@ -43,7 +43,7 @@ check_error()
 measure_kernel()
 {
   echo -e "Measure kernel $kernel (A["$1"x"$2"] * B["$2"x"$1"]) . . ."
-  cmd="$WORKDIR/measure $1 $2 10 10"
+  cmd="$WORKDIR/measure $1 $2 300 100"
   eval echo "exec command : $cmd" $output
   eval $cmd
   check_error "run measure failed"
@@ -166,7 +166,7 @@ echo "   m   |   k   |    GFLOPS/S     |   minimum (ms)   |   median (ms)   |   
 
   if [ $plot == 1 ]; then
     echo "Graph generation . . ."
-    python3 ./python/graph-gen-measure.py $WORKDIR/output/measure_tmp.out $plot_file
+    python3 ./python/graph-gen-measure.py $WORKDIR/output/measure_tmp.out $plot_file "$kernel ($precision)"
     echo "Graph created in file $plot_file"
   fi
 

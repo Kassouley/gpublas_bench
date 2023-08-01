@@ -34,8 +34,8 @@ if __name__ == "__main__":
 
     plt.xlabel("m")
     plt.ylabel("GFLOPS/S")
-    plt.title("Performance of rocBLAS for a A(mxk)*B(kxm) matrix multiplication")
-    # plt.legend(bbox_to_anchor=(1.02, 1), loc="upper left", ncol=2)
+    plt.title(f"Performance of {sys.argv[3]} for a A(mxk)*B(kxm) matrix multiplication")
+    plt.legend(bbox_to_anchor=(1.02, 1), loc="upper left", ncol=2)
     plt.tight_layout() 
     plt.grid(True)
     plt.savefig(sys.argv[2])

@@ -50,20 +50,17 @@ int main(int argc, char **argv)
             for (unsigned int i = 0; i < nwu; i++)
             {
                 kernel_gpublasXgemm(handle, m, k, a, b, c);
-                gpublas_deviceSynchronize();
             }
         }
         else
         {
             kernel_gpublasXgemm(handle, m, k, a, b, c);
-            gpublas_deviceSynchronize();
         }
 
         const double t1 = omp_get_wtime();
         for (unsigned int i = 0; i < nrep; i++)
         {
             kernel_gpublasXgemm(handle, m, k, a, b, c);
-            gpublas_deviceSynchronize();
         }
         const double t2 = omp_get_wtime();
         

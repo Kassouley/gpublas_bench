@@ -61,8 +61,8 @@ int main(int argc, char **argv)
             for (unsigned int i = 0; i < nwu; i++)
             {
                 kernel_gpublasXgemm(handle, m, k, d_a, d_b, d_c);
-                gpublas_deviceSynchronize();
             }
+            gpublas_deviceSynchronize();
         }
         else
         {
@@ -74,8 +74,8 @@ int main(int argc, char **argv)
         for (unsigned int i = 0; i < nrep; i++)
         {
             kernel_gpublasXgemm(handle, m, k, d_a, d_b, d_c);
-            gpublas_deviceSynchronize();
         }
+        gpublas_deviceSynchronize();
         const double t2 = omp_get_wtime();
         
         tdiff[n] = t2 - t1;
