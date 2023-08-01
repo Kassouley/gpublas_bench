@@ -1,0 +1,10 @@
+graphs/*
+output/*
+!graphs/.gitkeep
+!output/.gitkeep
+slurm*
+save/*
+*.o
+calibrate
+measure
+check
