@@ -16,15 +16,17 @@ Advice : use the script in the 'script/' folder
 No particulary installation needed.
 Just build with :
 ```bash
-make measure KERNEL=[KERNEL_NAME] GPU=[NVIDIA|AMD] CC=whateveruwant
-make check KERNEL=[KERNEL_NAME] GPU=[NVIDIA|AMD] CC=whateveruwant
+make measure KERNEL=[KERNEL_NAME] P=[SP|DP] GPU=[NVIDIA|AMD] CC=whateveruwant
+make check KERNEL=[KERNEL_NAME] P=[SP|DP] GPU=[NVIDIA|AMD] CC=whateveruwant
 ```
 
 KERNEL_NAME should be in uppercase.
 
 GPU is optional (AMD by default)
 
-CC is optional (AMD Clang on AMD and NVC on NVIDIA (NVCC for CUDA kernels) by default)
+P is the precision of the matrix multiplication : simple or double precision (DP by default)
+
+CC is optional (AMD Clang on AMD and NVC on NVIDIA (NVCC for cuBLAS kernels) by default)
 
 Then run with :
 ```bash
@@ -94,9 +96,9 @@ By using the script :
 
 Example :
 ```bash
-./script/measure.sh -p rocblas_wo_dt -v
+./script/measure.sh -p rocblas_wo_dt -vS
 ```
-will run a 1 benchmark of the kernel rocblas_wo_dt forin verbose and will generate a graph of the result
+will run a 1 benchmark of the kernel rocblas_wo_dt in simple precision in verbose and will generate a graph of the result
 
 Use the '-h' option for more information
 
